@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GIẶT SẤY ORI - Chấm công</title>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+      }
+      form {
+        width: 90%;
+        max-width: 400px;
+        margin: 20px auto;
+        background-color: #04a346;
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        text-align: center;
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+      }
+      input[type="text"],
+      select,
+      textarea,
+      input[type="submit"] {
+        width: 100%;
+        padding: 10px;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        padding: 10px 25px;
+        font-size: 18px;
+      }
+      select {
+        font-weight: normal;
+        height: 50px;
+      }
+      input[type="submit"] {
+        background-color: rgb(12, 80, 4);
+        color: white;
+        cursor: pointer;
+        border: none;
+      }
+      input[type="submit"]:hover {
+        background-color: #0056b3;
+      }
+
+      /* table */
+      .table-wrapper {
+        width: 90%;
+        max-width: 400px;
+        text-align: center;
+      }
+      #historyTable {
+        width: 90%;
+        max-width: 400px;
+        margin: 20px auto;
+        text-align: center;
+        border-collapse: collapse;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      #historyTable thead {
+        background-color: #d3d3d3;
+        color: #333;
+        font-weight: bold;
+      }
+
+      #historyTable th, #historyTable td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+      }
+
+      #historyTable tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+      }
+
+      #historyTable tbody tr:hover {
+        background-color: #e0e0e0;
+        transition: 0.3s;
+      }
+      /* end table */
+
+      /* start button */
+      .button-cham-cong {
+        background-color: rgb(12, 80, 4);
+        color: white;
+        cursor: pointer;
+        border: none;
+        width: 49%;
+        margin: 5px 0;
+        border: 1px solid #ccc;
+        border-radius: 13px;
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+        padding: 0px 0px 4px 0px;
+        font-size: 18px;
+      }
+
+      .button-cham-cong:hover {
+        background-color: #0056b3;
+      }
+
+      .filter {
+        -webkit-filter: brightness(0) invert(1);
+        filter: contrast(0%) brightness(2);
+      }
+      /* end button */
+
+      /* start spinning animation */
+      .lds-dual-ring {
+        /* change color here */
+        color: white;
+      }
+      .lds-dual-ring,
+      .lds-dual-ring:after {
+        box-sizing: border-box;
+      }
+      .lds-dual-ring {
+        display: inline-block;
+        width: 50px;
+        height: 50px;
+      }
+      .lds-dual-ring:after {
+        content: " ";
+        display: block;
+        width: 34px;
+        height: 34px;
+        margin: 8px;
+        border-radius: 50%;
+        border: 6.4px solid currentColor;
+        border-color: currentColor transparent currentColor transparent;
+        animation: lds-dual-ring 1.2s linear infinite;
+      }
+      @keyframes lds-dual-ring {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+      /* end spinning animation */
+    </style>
+  </head>
+  <body>
+    <form method="post" action="" name="contact-form">
+      <img
+        style="height: 4rem"
+        src="./images/ori-logo.png"
+        alt="Small Logo"
+      />
+      <img
+        style="height: 4rem"
+        src="./images/ori-text-logo.png"
+        alt="Long Logo"
+      />
+
+      <input
+        required
+        id="name"
+        type="text"
+        name="Tên"
+        placeholder="Họ và Tên nhân viên"
+      />
+
+      <textarea
+        name="Ghi chú của nhân viên (nếu có)"
+        rows="4"
+        placeholder="Ghi chú của nhân viên (nếu có)"
+      ></textarea>
+
+      <input
+        id="submitLocation"
+        type="Nơi chấm công"
+        name="Nơi chấm công"
+        placeholder="Nơi chấm công"
+        style="display: none"
+      />
+      <div id="message" style="display: none">
+        <div id="successMsg">
+          Xác nhận [status] lúc [time] tại [shopName], định vị:
+        </div>
+        <a id="gmapUrl" href="" style="color: white"></a>
+      </div>
+
+      <button class="button-cham-cong submit-btn" id="vaoca">
+        <img
+          style="height: 6rem"
+          src="./images/vao-ca-icon.png"
+          alt="Vao Ca Icon"
+          class="filter"
+        />
+        <br />
+        Vào Ca
+      </button>
+      <button class="button-cham-cong submit-btn" id="tanca">
+        <span style="padding-left: 9px;">
+          <img
+            style="height: 6rem"
+            src="./images/tan-ca-icon.png"
+            alt="Vao Ca Icon"
+            class="filter"
+          />
+        </span>
+        <br />
+        Tan Ca
+      </button>
+
+      <div id="spinning" class="lds-dual-ring" style="display: none"></div>
+    </form>
+    <span class="table-wrapper" id="tableWrapper">
+      <h5>Lần chấm công gần đây:</h5>
+      <table id="historyTable">
+        <thead>
+          <tr>
+            <th>Ngày giờ</th>
+            <th>Tên nhân viên</th>
+            <th>Trạng thái</th>
+            <th>Chi nhánh</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </span>
+  </body>
+  <!-- Script go here -->
+  <script>
+    const MAX_DISTANCE = 300; // meters
+
+    const shopCode2ShopInfo = {
+      "6PDC2J": {
+          "name": "Tiệm 1",
+          "location": {
+              "lat": 10.0416514, // shop 1 To Hien Thanh
+              "lng": 105.7553143,
+          },
+      },
+      "UZ3JLR": {
+          "name": "Tiệm 2",
+          "location": {
+              "lat": 10.0490362, // shop 2 Nguyen De
+              "lng": 105.7613264,
+          },
+      },
+      "VJEFR4": {
+          "name": "Tiệm 3",
+          "location": {
+              "lat": 10.037685, // shop 3 Nguyen Minh Quang
+              "lng": 105.756798,
+          },
+      },
+    }
+
+    const scriptURL = 
+    "https://script.google.com/macros/s/AKfycbxHflqlWsCAiDxgErMfgYiNM2WOa1cpHX7pOinQwvA0aO6PX5TZxFlTArIbZxQHUnV5/exec";
+
+    const submitLocation = document.getElementById("submitLocation");
+
+    const form = document.forms["contact-form"];
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const shopCode = urlParams.get("code");
+
+    var previousName = localStorage.getItem("name");
+    if (
+      previousName !== undefined &&
+      previousName !== null &&
+      previousName.trim() !== ""
+    ) {
+      document.getElementById("name").value = previousName;
+    }
+
+    // get the history
+    var historyList = loadHistory();
+    function loadHistory() {
+      var historyList = localStorage.getItem("historyList");
+      if (!historyList) {
+        historyList = [];
+      } else {
+        try {
+          historyList = JSON.parse(historyList);
+          if (!Array.isArray(historyList)) {
+            historyList = [];
+          }
+        } catch (error) {
+          console.error("Error parsing historyList from localStorage:", error);
+          historyList = [];
+        }
+      }
+
+      var tableBody = document.querySelector("#historyTable tbody");
+      tableBody.innerHTML = ""; // Clear existing table content
+
+      historyList.slice().reverse().forEach((record) => {
+        var row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${record.date}</td>
+          <td>${record.name}</td>
+          <td>${record.status}</td>
+          <td>${record.shopName}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+
+      var tableWrapper = document.getElementById("tableWrapper");
+      if (tableWrapper) {
+        if (historyList.length === 0) {
+          tableWrapper.style.display = "none";
+        } else {
+          tableWrapper.style.display = "block";
+          tableWrapper.style.display = "block";
+          tableWrapper.style.margin = "0 auto"; // Ensure centering
+          tableWrapper.style.width = "100%";
+          tableWrapper.style.maxWidth = "500px";
+        }
+      }
+
+      return historyList;
+    }
+
+    var vaoOrTanCa = null;
+
+    // Get the buttons by their IDs
+    var vaocaButton = document.getElementById("vaoca");
+    var tancaButton = document.getElementById("tanca");
+    // Add click event listeners to each button
+
+    vaocaButton.addEventListener("click", function (event) {
+      event.preventDefault(); // Prevent the default form submission behavior
+      vaoOrTanCa = "Vào Ca";
+      submitChamCong();
+    });
+    tancaButton.addEventListener("click", function (event) {
+      event.preventDefault(); // Prevent the default form submission behavior
+      vaoOrTanCa = "Tan Ca";
+      submitChamCong();
+    });
+
+    function submitChamCong() {
+      hideSubmitBtns();
+      document.getElementById("spinning").style.display = "block";
+
+      getLocation();
+    }
+
+    function hideSubmitBtns() {
+      const submitBtns = document.getElementsByClassName("submit-btn");
+
+      // Convert the HTMLCollection to an array for easier manipulation
+      let elementsArray = Array.from(submitBtns);
+
+      // Hide each element
+      elementsArray.forEach((element) => {
+        element.style.display = "none";
+      });
+    }
+
+    function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          fillPositionAndSubmit,
+          (error) => {
+            alert(
+              "Không thể truy cập vị trí. Vui lòng cho phép ứng dụng quét QR (Zalo) truy cập vị trí. \n(Vào Cài đặt tìm kiếm ứng dụng 'Zalo', cho phép Zalo truy cập vị trí.)"
+            );
+          },
+          {
+            timeout: 5000,
+            maximumAge: 5000,
+            enableHighAccuracy: true,
+          }
+        );
+      } else {
+        // not sure this work
+        alert(
+          "Thiết bị không hỗ trợ vị trí, vui lòng thử lại với trình duyệt khác (Safari, Chrome hoặc Firefox)"
+        );
+      }
+    }
+
+    function fillPositionAndSubmit(position) {
+      var curLat = position.coords.latitude;
+      var curLng = position.coords.longitude;
+
+      var googleMapUrl =
+        "https://maps.google.com/?q=" + curLat + "," + curLng + "";
+      submitLocation.value = googleMapUrl;
+
+      var formData = new FormData(form);
+
+      if (
+        shopCode === null ||
+        shopCode === undefined ||
+        shopCode.trim() === "" ||
+        shopCode2ShopInfo[shopCode] === null ||
+        shopCode2ShopInfo[shopCode] === undefined
+      ) {
+        alert("QR sai, thiếu mã chi nhánh");
+        window.location.reload();
+        throw new Error("QR sai, thiếu mã chi nhánh");
+      }
+      formData.set("Chi nhánh", shopCode2ShopInfo[shopCode].name);
+
+      if (
+        formData.get("Tên") === undefined ||
+        formData.get("Tên") === null ||
+        formData.get("Tên").trim() === ""
+      ) {
+        alert("Không được bỏ trống tên");
+        window.location.reload();
+        throw new Error("Không được bỏ trống tên");
+      }
+
+      if (formData.get("Tên")) {
+        // Allow Vietnamese characters, letters, numbers, spaces, and dots
+        let regex = /^[\p{L}0-9\s.]+$/u;
+              
+        if (!regex.test(formData.get("Tên"))) {
+          alert("Tên chỉ được chứa chữ cái, số, khoảng trắng và dấu chấm.");
+          window.location.reload();
+          throw new Error("Tên chỉ được chứa chữ cái, số, khoảng trắng và dấu chấm.");
+        }
+      }
+
+      // Verify device location
+      var hasValidLocation = false;
+
+      if (shopCode2ShopInfo[shopCode] && shopCode2ShopInfo[shopCode].location) {
+          var shopLocation = shopCode2ShopInfo[shopCode].location;
+          var distance = calculateDistance(
+              curLat,
+              curLng,
+              shopLocation.lat,
+              shopLocation.lng
+          ); // meters
+          if (distance < MAX_DISTANCE) {
+              hasValidLocation = true;
+          }
+      }
+
+      if (!hasValidLocation) {
+        alert(
+          "Lỗi! Không thể chấm công từ xa. Nhân viên chỉ có thể chấm công khi đang ở đúng chi nhánh"
+        );
+        window.location.reload();
+        throw new Error(
+          "Lỗi! Không thể chấm công từ xa. Nhân viên chỉ có thể chấm công khi đang ở đúng chi nhánh"
+        );
+      }
+
+      if (vaoOrTanCa) {
+        formData.set("Vào/Tan Ca", vaoOrTanCa);
+      } else {
+        alert("Lỗi! thiếu vào ca hoặc tan ca");
+        window.location.reload();
+        throw new Error("Lỗi! thiếu vào ca hoặc tan ca");
+      }
+
+      // Submit
+      fetch(scriptURL, { method: "POST", body: formData})
+        .then((response) => {
+          if (response.status == "200") {
+            alert("Xác nhận chấm công thành công");
+            var now = getFormattedNow();
+
+            // save the name
+            localStorage.setItem("name", formData.get("Tên"));
+
+            // save the history
+            historyList.push({
+              date: now,
+              name: formData.get("Tên"),
+              status: formData.get("Vào/Tan Ca"),
+              shopName: shopCode2ShopInfo[shopCode].name
+            });
+            if (historyList.length > 5) {
+              historyList.shift(); // Remove the oldest item (first item in the array)
+            }
+            localStorage.setItem("historyList", JSON.stringify(historyList));
+            loadHistory();
+
+            let msg = document.getElementById("successMsg").innerHTML;
+            msg = msg.replace("[status]", formData.get("Vào/Tan Ca"));
+            msg = msg.replace("[time]", now);
+            msg = msg.replace("[shopName]", shopCode2ShopInfo[shopCode].name);
+            document.getElementById("successMsg").innerHTML = msg;
+
+            var gUrlEl = document.getElementById("gmapUrl");
+            gUrlEl.innerHTML = googleMapUrl;
+            gUrlEl.href = googleMapUrl;
+            document.getElementById("message").style.display = "block";
+            hideSubmitBtns();
+            document.getElementById("spinning").style.display = "none";
+          } else {
+            alert("Chấm công thất bại");
+            window.location.reload();
+          }
+          return response.json();
+        })
+        .then(data => {
+            console.log("Response Body:", data); // Log response
+            if (data && data.result == "error") {
+              alert("Lỗi: " + data.message);
+              window.location.reload();
+            }
+        })
+        .catch((error) => console.error("Error!", error.message));
+    }
+
+    function getFormattedNow() {
+      const date = new Date(); // Assuming the current date and time
+
+      const day = String(date.getDate()).padStart(2, "0");
+      const month = String(date.getMonth() + 1).padStart(2, "0");
+      const year = date.getFullYear();
+      const hour = String(date.getHours()).padStart(2, "0");
+      const minute = String(date.getMinutes()).padStart(2, "0");
+
+      const formattedDate = `${day}/${month}/${year} ${hour}:${minute}`;
+
+      return formattedDate;
+    }
+
+    function calculateDistance(lat1, lon1, lat2, lon2) {
+      const earthRadius = 6371; // Radius of the Earth in kilometers
+
+      // Convert latitude and longitude from degrees to radians
+      const lat1Rad = degreesToRadians(lat1);
+      const lon1Rad = degreesToRadians(lon1);
+      const lat2Rad = degreesToRadians(lat2);
+      const lon2Rad = degreesToRadians(lon2);
+
+      // Calculate the differences between the latitudes and longitudes
+      const latDiff = lat2Rad - lat1Rad;
+      const lonDiff = lon2Rad - lon1Rad;
+
+      // Use the Haversine formula to calculate the distance
+      const a =
+        Math.sin(latDiff / 2) * Math.sin(latDiff / 2) +
+        Math.cos(lat1Rad) *
+          Math.cos(lat2Rad) *
+          Math.sin(lonDiff / 2) *
+          Math.sin(lonDiff / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+      // Calculate the distance in meters
+      const distance = earthRadius * c * 1000;
+
+      return distance;
+    }
+
+    // Helper function to convert degrees to radians
+    function degreesToRadians(degrees) {
+      return (degrees * Math.PI) / 180;
+    }
+  </script>
+  <!-- Script end here -->
+</html>
